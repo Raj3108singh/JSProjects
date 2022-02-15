@@ -1,39 +1,52 @@
 //Get Quotes API
 
 const newQuote = document.querySelector("#new-quote");
+const quoteContainer = document.querySelector("#Quote-container");
 const quoteText = document.querySelector("#quote");
 const author = document.querySelector("#author");
 const twitter = document.querySelector("#twitter");
+const loader = document.querySelector("#loader");
+let apiQuotes = [];
 
 function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
 
-newQuote.addEventListener("click", async () => {
-  const quoteData = await fetch("https://type.fit/api/quotes");
-  const data = await quoteData.json();
-  console.log(data);
-  const maxNumber = getRandomInt(data.length);
-  console.log(maxNumber);
-  //  quoteText.innerHTML = "";
-  quoteText.textContent = data[maxNumber].text;
-  if (data[maxNumber].author) {
-    author.textContent = data[maxNumber].author;
-  } else {
-    author.textContent = "Unknown";
-  }
-});
+function loading() {
+  loader.hidden = false;
+  quoteContainer.hidden = true;
+}
 
-let apiQuotes = [];
+function loaded() {
+  loader.hidden = true;
+  quoteContainer.hidden = false;
+}
 async function getQuotes() {
+  loading();
   const Url = "https://type.fit/api/quotes";
   try {
-    if (!response.ok) alert(`${response.data.message}`);
     const response = await fetch(Url);
     const data = await response.json();
     const maxNumber = getRandomInt(data.length);
-    quoteText.innerHTML = "";
-    quoteText.innerHTML = data[maxNumber].text;
-    author.innerHTML = data[maxNumber].author;
-  } catch {}
+    quoteText.textContent = data[maxNumber].text;
+    if (author.textContent) {
+      author.textContent = data[maxNumber].author;
+    } else {
+      author.textContent = "Udefined";
+    }
+    loaded();
+  } catch (err) {
+    alert(err.message);
+  }
 }
+
+loaded();
+newQuote.addEventListener("click", getQuotes);
+
+// Tweet Code
+function tweetCode() {
+  const twitterUrl = `https://twitter.com/intent/tweet?text=${quoteText.textContent} - ${author.textContent}`;
+  window.open(twitterUrl, "_blank");
+}
+
+twitter.addEventListener("click", tweetCode);
